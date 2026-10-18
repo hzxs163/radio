@@ -26,11 +26,13 @@ jobs:
           curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/api_core_cn.json "https://roamdial.com/api/globe?part=core&r=cn"
           curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/api_rest.json "https://roamdial.com/api/globe?part=rest&r=cn"
           curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/land-dots.json "https://roamdial.com/land-dots.json"
-          # 基本校验：非空、以 { 开头（JSON 对象）、大小合理，防止抓到错误页面
-          for f in /tmp/api_core_cn.json /tmp/api_rest.json /tmp/land-dots.json; do
+          # 基本校验：非空、JSON 开头正确（api_* 为对象 {，land-dots 为数组 [），防止抓到错误页面
+          for f in /tmp/api_core_cn.json /tmp/api_rest.json; do
             [ -s "$f" ] || { echo "文件为空: $f"; exit 1; }
-            head -c 1 "$f" | grep -q '{' || { echo "不是 JSON: $f"; exit 1; }
+            head -c 1 "$f" | grep -q '{' || { echo "不是 JSON 对象: $f"; exit 1; }
           done
+          [ -s /tmp/land-dots.json ] || { echo "文件为空: /tmp/land-dots.json"; exit 1; }
+          head -c 1 /tmp/land-dots.json | grep -q '\[' || { echo "不是 JSON 数组: /tmp/land-dots.json"; exit 1; }
 
       - name: 检测是否有更新
         id: check
