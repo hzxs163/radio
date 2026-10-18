@@ -51,19 +51,30 @@ somewhere new.</h1>
     <script>
       (function () {
         var q = new URLSearchParams(location.search), l = q.get('lang'), seen = false, el = document.getElementById('shell');
-        var src = 'assets/index-B3p6nJ-f.js', done = false;
+        var src = 'assets/index-B3p6nJ-f.js', done = false, fired = false, hideIntro = false, timer = 0;
+        function fire() {
+          if (fired) return; fired = true; clearTimeout(timer);
+          if (hideIntro && el) el.remove();
+          var s = document.createElement('script'); s.type = 'module'; s.crossOrigin = 'anonymous'; s.src = src; document.head.appendChild(s);
+        }
+        // 静态托管下 /api/* 全靠 sw.js 顶替后端，而首次访问的页面此刻还不受它控制：直接放模块会让 core 数据直连 Pages 吃 404（包里 core 没有重试），新访客只能手动刷新一次。
+        // 所以等 controller 就位再启动，最多等 2 秒；超时照旧加载，SW 装不上时也仍能走到底（那时接口本来也没人答，等更久没意义）。
         function go() {
           if (done) return; done = true;
-          var s = document.createElement('script'); s.type = 'module'; s.crossOrigin = 'anonymous'; s.src = src; document.head.appendChild(s);
+          if (!('serviceWorker' in navigator) || navigator.serviceWorker.controller) { fire(); return; }
+          timer = setTimeout(fire, 2000);
+          navigator.serviceWorker.ready.then(function () {
+            (function poll() { if (navigator.serviceWorker.controller) fire(); else if (!fired) setTimeout(poll, 40); })();
+          }, function () { fire(); });
         }
         try { if (l !== 'zh' && l !== 'en') l = localStorage.getItem('roamdial.lang'); seen = localStorage.getItem('roamdial.seen') === '1'; } catch (e) { }
         if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
-        if (seen || q.get('s')) { el.remove(); go(); return; }
+        // 注册 Service Worker（静态托管下代理 /api/* 动态接口）；先注册再决定启动时机，ready 才有东西可等
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () { });
+        if (seen || q.get('s')) { hideIntro = true; go(); return; }
         if (matchMedia('(max-width: 560px)').matches) el.classList.add('ph');
         if (l === 'zh') { el.querySelectorAll('[data-zh]').forEach(function (n) { n.textContent = n.getAttribute('data-zh'); }); document.documentElement.lang = 'zh-CN'; }
         if (document.visibilityState === 'hidden') go(); else requestAnimationFrame(function () { requestAnimationFrame(go); });
-        // 注册 Service Worker（静态托管下代理 /api/* 动态接口）
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
       })();
     </script>
   </body>
