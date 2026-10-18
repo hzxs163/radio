@@ -3,7 +3,13 @@ name: Daily data refresh
 on:
   schedule:
     - cron: '0 2 * * *'   # 每天 UTC 02:00 = 北京时间 10:00
-  workflow_dispatch:       # 支持手动触发
+  workflow_dispatch:
+    inputs:
+      use_fallback:
+        description: '强制使用备用数据源 (radio-browser.info)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -15,11 +21,15 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: 下载原站最新数据
+      # ---- 主数据源：roamdial.com（原站快照） ----
+      - name: 主源下载 (roamdial.com)
+        id: main
+        continue-on-error: true
+        if: ${{ !inputs.use_fallback }}
         run: |
           set -euo pipefail
           UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 RoamDialMirror/1.0"
@@ -33,12 +43,36 @@ jobs:
           done
           [ -s /tmp/land-dots.json ] || { echo "文件为空: /tmp/land-dots.json"; exit 1; }
           head -c 1 /tmp/land-dots.json | grep -q '\[' || { echo "不是 JSON 数组: /tmp/land-dots.json"; exit 1; }
+          echo "主源下载成功"
+
+      # ---- 备用数据源：radio-browser.info（主源失败或手动强制时） ----
+      - name: 备用源下载 (radio-browser.info)
+        id: fallback
+        if: ${{ steps.main.outcome == 'failure' || inputs.use_fallback }}
+        run: |
+          echo "使用备用数据源 radio-browser.info ..."
+          python3 .github/scripts/fetch_radio_browser.py /tmp
+          echo "备用源生成成功（land-dots.json 保持仓库现有版本）"
+
+      # ---- 校验最终结果 ----
+      - name: 校验数据文件
+        run: |
+          set -euo pipefail
+          for f in api_core_cn.json api_rest.json; do
+            [ -s "/tmp/$f" ] || { echo "缺少 $f"; exit 1; }
+            head -c 1 "/tmp/$f" | grep -q '{' || { echo "格式错误: $f"; exit 1; }
+          done
+          if [ -f /tmp/land-dots.json ]; then
+            head -c 1 /tmp/land-dots.json | grep -q '\[' || { echo "格式错误: land-dots.json"; exit 1; }
+          fi
+          echo "数据校验通过"
 
       - name: 检测是否有更新
         id: check
         run: |
           changed=0
           for f in api_core_cn.json api_rest.json land-dots.json; do
+            [ -f "/tmp/$f" ] || continue   # 备用源不更新 land-dots
             if [ -f "$f" ] && cmp -s "/tmp/$f" "$f"; then
               echo "无变化: $f"
             else
@@ -62,9 +96,9 @@ jobs:
       - name: 写入新数据
         if: steps.check.outputs.changed == '1'
         run: |
-          cp /tmp/api_core_cn.json api_core_cn.json
-          cp /tmp/api_rest.json api_rest.json
-          cp /tmp/land-dots.json land-dots.json
+          for f in api_core_cn.json api_rest.json land-dots.json; do
+            [ -f "/tmp/$f" ] && cp "/tmp/$f" "$f"
+          done
 
       - name: 清理超过 360 个的备份
         if: steps.check.outputs.changed == '1'
