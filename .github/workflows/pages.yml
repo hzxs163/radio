@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: 排除数据备份目录（不部署到 Pages）
+        run: rm -rf backups
       - uses: actions/configure-pages@v5
         with:
           enablement: true

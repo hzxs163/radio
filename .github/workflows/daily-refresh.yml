@@ -1,0 +1,88 @@
+name: Daily data refresh
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 每天 UTC 02:00 = 北京时间 10:00
+  workflow_dispatch:       # 支持手动触发
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 下载原站最新数据
+        run: |
+          set -euo pipefail
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 RoamDialMirror/1.0"
+          curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/api_core_cn.json "https://roamdial.com/api/globe?part=core&r=cn"
+          curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/api_rest.json "https://roamdial.com/api/globe?part=rest&r=cn"
+          curl -fsSL --retry 3 --connect-timeout 20 -A "$UA" -o /tmp/land-dots.json "https://roamdial.com/land-dots.json"
+          # 基本校验：非空、以 { 开头（JSON 对象）、大小合理，防止抓到错误页面
+          for f in /tmp/api_core_cn.json /tmp/api_rest.json /tmp/land-dots.json; do
+            [ -s "$f" ] || { echo "文件为空: $f"; exit 1; }
+            head -c 1 "$f" | grep -q '{' || { echo "不是 JSON: $f"; exit 1; }
+          done
+
+      - name: 检测是否有更新
+        id: check
+        run: |
+          changed=0
+          for f in api_core_cn.json api_rest.json land-dots.json; do
+            if [ -f "$f" ] && cmp -s "/tmp/$f" "$f"; then
+              echo "无变化: $f"
+            else
+              echo "有变化: $f"
+              changed=1
+            fi
+          done
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+      - name: 备份旧数据（按日期保存）
+        if: steps.check.outputs.changed == '1'
+        run: |
+          set -euo pipefail
+          TODAY=$(date +%F)
+          mkdir -p "backups/$TODAY"
+          for f in api_core_cn.json api_rest.json land-dots.json; do
+            [ -f "$f" ] && cp "$f" "backups/$TODAY/"
+          done
+          echo "旧数据已备份到 backups/$TODAY/"
+
+      - name: 写入新数据
+        if: steps.check.outputs.changed == '1'
+        run: |
+          cp /tmp/api_core_cn.json api_core_cn.json
+          cp /tmp/api_rest.json api_rest.json
+          cp /tmp/land-dots.json land-dots.json
+
+      - name: 清理超过 360 个的备份
+        if: steps.check.outputs.changed == '1'
+        run: |
+          set -euo pipefail
+          cd backups
+          TOTAL=$(ls -1d 20[0-9][0-9]-[0-9][0-9]-*/ 2>/dev/null | wc -l)
+          if [ "$TOTAL" -gt 360 ]; then
+            ls -1d 20[0-9][0-9]-[0-9][0-9]-*/ | sort | head -n $((TOTAL - 360)) | xargs rm -rf
+            echo "已清理 $((TOTAL - 360)) 个过期备份，当前保留 360 个"
+          else
+            echo "备份数 $TOTAL，无需清理"
+          fi
+
+      - name: 提交并推送
+        if: steps.check.outputs.changed == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(data): 每日数据更新 $(date +%F)" || { echo "无变更可提交"; exit 0; }
+          git push
+          echo "已提交并推送最新数据"
