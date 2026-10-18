@@ -130,8 +130,11 @@ def build(outdir):
     tzs = ["UTC"]  # Radio Browser 无时区字段，备用降级为 UTC
     tz_idx = 0
 
+    # 前端把两份分片当同一批数据处理：core.builtAt/rg 与 rest 不一致就直接报「电台数据正在更新」，
+    # 所以时间戳取一次共用，rg 也必须同一个值。
+    built_at = int(time.time() * 1000)
     core = {
-        "rg": "cn", "v": 3, "builtAt": int(time.time() * 1000), "n": n,
+        "rg": "cn", "v": 3, "builtAt": built_at, "n": n,
         "tzs": tzs, "genres": genres, "genresEn": genres_en,
         "langs": langs, "langsEn": langs_en,
         "countries": countries,
@@ -139,7 +142,7 @@ def build(outdir):
         "pop": [], "br": [], "fl": [],
     }
     rest = {
-        "builtAt": int(time.time() * 1000), "rg": "c", "tz": [],
+        "builtAt": built_at, "rg": "cn", "tz": [],
         "id": [], "name": [], "url": [], "tags": [], "state": [],
     }
 

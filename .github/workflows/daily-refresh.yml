@@ -67,6 +67,30 @@ jobs:
           fi
           echo "数据校验通过"
 
+      # 前端把两份分片当同一批数据：core.builtAt/rg 与 rest 不一致就判定「数据正在更新」，
+      # 强制刷新一次仍不一致会直接报错卡片，所以自相矛盾的快照绝对不能提交。
+      - name: 校验分片一致性
+        run: |
+          set -euo pipefail
+          node -e '
+            const fs = require("fs");
+            const core = JSON.parse(fs.readFileSync("/tmp/api_core_cn.json", "utf8"));
+            const rest = JSON.parse(fs.readFileSync("/tmp/api_rest.json", "utf8"));
+            if (core.builtAt !== rest.builtAt) {
+              console.error(`builtAt 不一致: core=${core.builtAt} rest=${rest.builtAt}`);
+              process.exit(1);
+            }
+            if (core.rg !== rest.rg) {
+              console.error(`rg 不一致: core=${JSON.stringify(core.rg)} rest=${JSON.stringify(rest.rg)}`);
+              process.exit(1);
+            }
+            if (!Array.isArray(rest.id) || rest.id.length !== core.n) {
+              console.error(`行数不一致: core.n=${core.n} rest.id=${Array.isArray(rest.id) ? rest.id.length : typeof rest.id}`);
+              process.exit(1);
+            }
+            console.log(`分片一致性通过: builtAt=${core.builtAt} rg=${core.rg} 行数=${core.n}`);
+          '
+
       - name: 检测是否有更新
         id: check
         run: |
