@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 小尺寸简化版：去掉指针、加粗圆环、放大信号点。浅色和深色标签栏都要实测 -->
+  <rect width="64" height="64" rx="14" fill="#172D2A"/>
+  <path d="M51.7 29.53A20 20 0 1 1 35.47 13.3" fill="none" stroke="#F5F1E8" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="47.56" cy="17.44" r="5.6" fill="#F36B45"/>
+</svg>

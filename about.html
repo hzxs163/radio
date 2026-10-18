@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#101F1D" />
+<title>About · RoamDial</title>
+<meta name="description" content="RoamDial is a free way to drop in on live radio from around the world, right in your browser." />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root{--bg:#101F1D;--ink:#F5F1E8;--dim:#B3C1B7;--faint:rgba(245,241,232,.16);--signal:#F36B45;--ink-dark:#172D2A;--sans:'Inter',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  main{max-width:680px;margin:0 auto;padding:40px 16px 72px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:40px}
+  .logo{display:inline-flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:600;font-size:18px}
+  .lang{display:flex;gap:4px}
+  .lang button{background:none;border:1px solid var(--faint);color:var(--dim);border-radius:999px;padding:4px 12px;font:12px var(--mono);cursor:pointer}
+  .lang button.on{background:var(--ink);color:var(--ink-dark);border-color:var(--ink)}
+  .lede{font-size:19px;line-height:1.55;color:var(--ink)}
+  h1{font-size:32px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+  h2{font-size:17px;margin:32px 0 6px}
+  p,li{color:var(--dim)} b{color:var(--ink);font-weight:600}
+  ul{padding-left:20px;margin:6px 0}
+  a{color:var(--ink);text-underline-offset:2px}
+  .meta{font:12px var(--mono);color:var(--dim)}
+  .q{margin:14px 0 26px;font:400 26px/1.25 'Instrument Serif','Songti SC',serif;color:var(--ink)} /* 标语，同 App「关于」面板 */
+  [data-l=en] .q span{font-style:italic}
+  .q cite{display:block;margin-top:9px;font:11px/1 var(--mono);font-style:normal;letter-spacing:.1em;color:var(--dim)}
+  [data-l]{display:none} html[lang=en] [data-l=en], html[lang=zh-CN] [data-l=zh]{display:block}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a class="logo" href="./"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><path d="M52.28 27.56A21 21 0 1 1 37.44 12.72" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><path d="M25.5 40.5L34.5 31.5" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><circle cx="47.9" cy="17.1" r="4.8" fill="#F36B45"/></svg>RoamDial</a>
+    <div class="lang"><button data-set="en">EN</button><button data-set="zh">中文</button></div>
+  </div>
+
+  <section data-l="en">
+    <h1>About RoamDial</h1>
+    <blockquote class="q"><span>Follow the stream, forget how far.</span><cite>— Tao Yuanming, "The Peach Blossom Spring"</cite></blockquote>
+    <p class="lede">Every radio station is a small window into a place: its language, its news, its ads, the songs someone there picked this morning. RoamDial makes it easy to open one — press play and see where you land.</p>
+
+    <h2>What we care about</h2>
+    <ul>
+      <li><b>Sound first.</b> Play, next station and save are always within reach. The sky behind them is there to explore, never in the way.</li>
+      <li><b>Browse by sound.</b> Stations are laid out by genre as a sky you can wander, not only pinned to a map.</li>
+      <li><b>Honest.</b> We only show what we can actually get: no fake waveforms when a station's audio can't be read, no city when we only know the country, bitrates exactly as each station reports them.</li>
+      <li><b>Keeps playing.</b> When one stream of a station fails, we try its next one.</li>
+    </ul>
+
+    <h2>What it isn't</h2>
+    <p>It isn't a music service and doesn't promise every station on earth. What you hear is whatever each station is broadcasting right now. There are no accounts and no ads.</p>
+
+    <h2>Where it comes from</h2>
+    <p>The station directory comes from <a href="https://www.radio-browser.info/" rel="noopener">Radio Browser</a>, a community-run database; places come from <a href="https://www.geonames.org/" rel="noopener">GeoNames</a>. Audio streams directly from each station's own server. See <a href="privacy.html">Privacy</a> for what data goes where.</p>
+
+    <h2>Contact</h2>
+    <p>A broken station, a wrong location, an idea — all welcome: <a href="/cdn-cgi/l/email-protection#573f323b3b38172538363a333e363b7934383a"><span class="__cf_email__" data-cfemail="afc7cac3c3c0efddc0cec2cbc6cec381ccc0c2">[email&#160;protected]</span></a></p>
+    <p>Updates and new features: <a href="https://x.com/RoamDial" rel="noopener">@RoamDial on X</a></p>
+  </section>
+
+  <section data-l="zh">
+    <h1>关于 RoamDial</h1>
+    <blockquote class="q"><span>缘溪行，忘路之远近</span><cite>— 陶渊明《桃花源记》</cite></blockquote>
+    <p class="lede">每个电台都是通往某个地方的一扇小窗：那里的语言、新闻、广告，还有当地人今早挑的歌。RoamDial 想让推开这扇窗变得很容易——按下播放，看看会落在哪里。</p>
+
+    <h2>我们在意的事</h2>
+    <ul>
+      <li><b>声音优先。</b>播放、下一站、收藏永远在手边。背后的星图用来逛，但不挡路。</li>
+      <li><b>按声音逛。</b>电台按流派铺成一片星空，不只是钉在地图上。</li>
+      <li><b>真实。</b>只展示拿得到的信息：读不到频谱就不画假波形，只知道国家就不标城市，码率照电台自报的写。</li>
+      <li><b>不轻易断。</b>一个台的一条线路不通，会自动换下一条。</li>
+    </ul>
+
+    <h2>它不是什么</h2>
+    <p>它不是音乐播放器，也不承诺收录世界上所有电台。你听到的，就是那个台此刻正在播的。没有账号，没有广告。</p>
+
+    <h2>数据从哪来</h2>
+    <p>电台目录来自社区维护的 <a href="https://www.radio-browser.info/" rel="noopener">Radio Browser</a>，地理数据来自 <a href="https://www.geonames.org/" rel="noopener">GeoNames</a>。声音直接来自各电台自己的服务器。数据会经过哪些地方，见<a href="privacy.html">隐私说明</a>。</p>
+
+    <h2>联系我们</h2>
+    <p>坏掉的台、标错的地点、想法和建议，都欢迎来信：<a href="/cdn-cgi/l/email-protection#ea828f868685aa98858b878e838b86c4898587"><span class="__cf_email__" data-cfemail="c1a9a4adadae81b3aea0aca5a8a0adefa2aeac">[email&#160;protected]</span></a></p>
+    <p>更新和新功能会发在 X：<a href="https://x.com/RoamDial" rel="noopener">@RoamDial</a></p>
+  </section>
+</main>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  (function () {
+    var KEY_L = 'roamdial.lang';
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    var q = new URLSearchParams(location.search).get('lang');
+    var l = q === 'zh' || q === 'en' ? q : get(KEY_L) || (/^zh/i.test(navigator.language || '') ? 'zh' : 'en');
+    function apply(x) {
+      l = x; document.documentElement.lang = x === 'zh' ? 'zh-CN' : 'en';
+      document.title = x === 'zh' ? '关于 · RoamDial' : 'About · RoamDial';
+      document.querySelectorAll('[data-set]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-set') === x); });
+    }
+    document.querySelectorAll('[data-set]').forEach(function (b) { b.onclick = function () { set(KEY_L, b.getAttribute('data-set')); apply(b.getAttribute('data-set')); }; });
+    apply(l);
+  })();
+</script>
+</body>
+</html>

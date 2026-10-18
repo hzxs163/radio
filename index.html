@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="rd-cc" content="CN"><meta name="rd-built" content="2026-10-18T02%3A31%3A39.069Z">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#101F1D" />
+    <title>RoamDial — Listen somewhere new.</title>
+    <meta name="description" content="Random live radio from around the world, right in your browser. Roam a sky of stations by sound, filter by bitrate, and share any station with a link." />
+    <meta property="og:title" content="RoamDial — Listen somewhere new." />
+    <meta property="og:description" content="Random live radio from around the world, right in your browser. Press play. Leave the destination to chance." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RoamDial" />
+    <meta property="og:url" content="https://roamdial.com/" />
+    <meta property="og:image" content="og.png?v=2" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="RoamDial — Listen somewhere new." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@RoamDial" />
+    <meta name="twitter:image" content="og.png?v=2" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="RoamDial" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="stylesheet" href="fonts/fonts.css">
+    <link rel="stylesheet" crossorigin href="assets/index-BAO5wuaO.css">
+  </head>
+  <body>
+    <div class="gx pre" id="shell"><div class="intro night land">
+        <div class="ibrand">
+          <div class="logo"><svg class="mark" width="24" height="24" viewBox="0 0 64 64" aria-hidden="true"><path d="M52.28 27.56A21 21 0 1 1 37.44 12.72" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><path d="M25.5 40.5L34.5 31.5" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><circle cx="47.9" cy="17.1" r="4.8" fill="var(--signal)"/></svg>RoamDial</div>
+          <div class="islog" data-zh="缘溪行，忘路之远近">Follow the stream, forget how far.</div>
+          <div class="isrc" data-zh="— 陶渊明《桃花源记》">— Tao Yuanming, “The Peach Blossom Spring”</div>
+        </div>
+        <div class="inow">
+          <div class="ik"><i></i><span>&nbsp;</span></div>
+          <h1 class="inm" data-zh="随机一站，&#10;听见世界。">Listen
+somewhere new.</h1>
+          <p class="isub" data-zh="按下播放，目的地交给运气。">Press play. Leave the destination to chance.</p>
+          <div class="iacts">
+            <button class="btn primary big" disabled><svg viewBox="0 0 24 24" class="ic f" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><span data-zh="正在载入电台…">Loading stations…</span></button>
+            <button class="lnk" disabled data-zh="先逛逛星图">Explore the sky</button>
+          </div>
+        </div>
+        <div class="mono dim credit"><span data-zh="电台目录来自 Radio Browser · 地理数据来自 GeoNames">Station directory by Radio Browser · places by GeoNames</span> · <a href="about.html" data-zh="关于">About</a> · <a href="privacy.html" data-zh="隐私">Privacy</a></div>
+      </div></div>
+    <div id="root"></div>
+    <script>
+      (function () {
+        var q = new URLSearchParams(location.search), l = q.get('lang'), seen = false, el = document.getElementById('shell');
+        var src = 'assets/index-B3p6nJ-f.js', done = false;
+        function go() {
+          if (done) return; done = true;
+          var s = document.createElement('script'); s.type = 'module'; s.crossOrigin = 'anonymous'; s.src = src; document.head.appendChild(s);
+        }
+        try { if (l !== 'zh' && l !== 'en') l = localStorage.getItem('roamdial.lang'); seen = localStorage.getItem('roamdial.seen') === '1'; } catch (e) { }
+        if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+        if (seen || q.get('s')) { el.remove(); go(); return; }
+        if (matchMedia('(max-width: 560px)').matches) el.classList.add('ph');
+        if (l === 'zh') { el.querySelectorAll('[data-zh]').forEach(function (n) { n.textContent = n.getAttribute('data-zh'); }); document.documentElement.lang = 'zh-CN'; }
+        if (document.visibilityState === 'hidden') go(); else requestAnimationFrame(function () { requestAnimationFrame(go); });
+        // 注册 Service Worker（静态托管下代理 /api/* 动态接口）
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+      })();
+    </script>
+  </body>
+</html>

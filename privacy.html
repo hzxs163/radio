@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#101F1D" />
+<title>Privacy · RoamDial</title>
+<meta name="description" content="What RoamDial stores, what it sends, and the choices you have." />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root{--bg:#101F1D;--ink:#F5F1E8;--dim:#B3C1B7;--faint:rgba(245,241,232,.16);--signal:#F36B45;--ink-dark:#172D2A;--sans:'Inter',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  main{max-width:680px;margin:0 auto;padding:40px 16px 72px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:40px}
+  .logo{display:inline-flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:600;font-size:18px}
+  .lang{display:flex;gap:4px}
+  .lang button{background:none;border:1px solid var(--faint);color:var(--dim);border-radius:999px;padding:4px 12px;font:12px var(--mono);cursor:pointer}
+  .lang button.on{background:var(--ink);color:var(--ink-dark);border-color:var(--ink)}
+  h1{font-size:32px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+  h2{font-size:17px;margin:32px 0 6px}
+  p,li{color:var(--dim)} b{color:var(--ink);font-weight:600}
+  ul{padding-left:20px;margin:6px 0}
+  a{color:var(--ink);text-underline-offset:2px}
+  .meta{font:12px var(--mono);color:var(--dim)}
+  .choice{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+  .btn{height:40px;padding:0 18px;border-radius:999px;border:1px solid rgba(245,241,232,.3);background:none;color:var(--ink);font:600 14px var(--sans);cursor:pointer}
+  .btn:hover{border-color:var(--ink)}
+  [data-l]{display:none} html[lang=en] [data-l=en], html[lang=zh-CN] [data-l=zh]{display:block}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a class="logo" href="./"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><path d="M52.28 27.56A21 21 0 1 1 37.44 12.72" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><path d="M25.5 40.5L34.5 31.5" fill="none" stroke="currentColor" stroke-width="7.5" stroke-linecap="round"/><circle cx="47.9" cy="17.1" r="4.8" fill="#F36B45"/></svg>RoamDial</a>
+    <div class="lang"><button data-set="en">EN</button><button data-set="zh">中文</button></div>
+  </div>
+
+  <section data-l="en">
+    <h1>Privacy</h1>
+    <p class="meta">Last updated 16 October 2026</p>
+    <p>RoamDial (roamdial.com) plays live radio from around the world. There are no accounts and no ads, and we don't sell data.</p>
+
+    <h2>Stored only in your browser</h2>
+    <p>Saved stations and songs, language, volume, the last station you heard and your analytics choice are kept in your browser's local storage. Clearing site data removes them.</p>
+
+    <h2>Streams and other services</h2>
+    <p>Audio comes <b>directly from each station's own server</b>, not through ours. Lyrics and similar features are looked up by your browser from third-party services. These servers see your IP address, and their own policies apply.</p>
+
+    <h2>Anonymous usage and error reports</h2>
+    <p>To improve RoamDial and fix playback problems, we collect anonymous usage and error information: which features are used, which stations fail to play, browser type and approximate country. <b>We don't store your IP address</b> — only a code derived from it with a secret key, so we can tell visitors apart and stop abuse. Usage records are kept for 90 days. None of this is used for advertising or sold.</p>
+
+    <h2>Google Analytics</h2>
+    <p>We use Google Analytics 4 to understand how RoamDial is used: pages viewed, a few actions (start listening, next station, playback failed, save, share), approximate location and device/browser type. Google Analytics 4 does not store full IP addresses. Event data is kept for 2 months. Advertising features are off.</p>
+    <p>In the EU/EEA, the UK and Switzerland, Google Analytics loads <b>only after you allow it</b>.</p>
+    <div class="choice"><span class="meta" id="state-en"></span><button class="btn" data-reset>Change my choice</button></div>
+
+    <h2>Complaints & contact</h2>
+    <p>If you run a station or hold rights and want something removed, or have any other complaint, email <a href="/cdn-cgi/l/email-protection#127a777e7e7d52607d737f767b737e3c717d7f"><span class="__cf_email__" data-cfemail="38505d545457784a5759555c515954165b5755">[email&#160;protected]</span></a> and we'll deal with it promptly.</p>
+    <p>For privacy questions, email <a href="/cdn-cgi/l/email-protection#2e5e5c47584f4d576e5c414f434a474f42004d4143"><span class="__cf_email__" data-cfemail="c0b0b2a9b6a1a3b980b2afa1ada4a9a1aceea3afad">[email&#160;protected]</span></a>.</p>
+  </section>
+
+  <section data-l="zh">
+    <h1>隐私说明</h1>
+    <p class="meta">更新于 2026-10-16</p>
+    <p>RoamDial（roamdial.com）播放世界各地的电台直播。没有账号，没有广告，不出售任何数据。</p>
+
+    <h2>只存在你的浏览器里</h2>
+    <p>收藏的台和歌、语言、音量、上次听的台，以及你对统计的选择，都存在浏览器本地。清除本站数据即可删除。</p>
+
+    <h2>电台音频与其他服务</h2>
+    <p>声音<b>直接来自各电台自己的服务器</b>，不经过我们；歌词等功能由你的浏览器直接向第三方服务查询。这些服务器能看到你的 IP 地址，适用对方自己的政策。</p>
+
+    <h2>匿名使用与错误统计</h2>
+    <p>为了改进产品、排查播放问题，我们会匿名收集使用情况和错误信息：用了哪些功能、哪些台播放失败、浏览器类型和大致国家。<b>我们不保存你的 IP 地址</b>，只保存用密钥由它算出的代号，用来区分不同访客、防止刷量。使用记录保留 90 天。这些信息不用于广告，也不出售。</p>
+
+    <h2>Google Analytics</h2>
+    <p>我们用 Google Analytics 4 了解大家怎么使用 RoamDial：看了哪些页面、几个操作（开始收听、下一站、播放失败、收藏、分享）、大致位置、设备和浏览器类型。Google Analytics 4 不保存完整 IP 地址。事件数据保留 2 个月。广告功能关闭。</p>
+    <p>在欧盟 / 欧洲经济区、英国和瑞士，<b>你同意之后</b>才会加载 Google Analytics。</p>
+    <div class="choice"><span class="meta" id="state-zh"></span><button class="btn" data-reset>重新选择</button></div>
+
+    <h2>投诉与联系</h2>
+    <p>如果你是电台或版权方、希望下架内容，或有其他投诉，请发邮件到 <a href="/cdn-cgi/l/email-protection#0d65686161624d7f626c6069646c61236e6260"><span class="__cf_email__" data-cfemail="a2cac7cececde2d0cdc3cfc6cbc3ce8cc1cdcf">[email&#160;protected]</span></a>，我们会尽快处理。</p>
+    <p>隐私相关问题请发到 <a href="/cdn-cgi/l/email-protection#3545475c4354564c75475a5458515c54591b565a58"><span class="__cf_email__" data-cfemail="0f7f7d66796e6c764f7d606e626b666e63216c6062">[email&#160;protected]</span></a>。</p>
+  </section>
+</main>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  (function () {
+    var KEY_L = 'roamdial.lang', KEY_C = 'roamdial.consent';
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+    var q = new URLSearchParams(location.search).get('lang');
+    var l = q === 'zh' || q === 'en' ? q : get(KEY_L) || (/^zh/i.test(navigator.language || '') ? 'zh' : 'en');
+    function apply(x) {
+      l = x; document.documentElement.lang = x === 'zh' ? 'zh-CN' : 'en';
+      document.title = x === 'zh' ? '隐私说明 · RoamDial' : 'Privacy · RoamDial';
+      document.querySelectorAll('[data-set]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-set') === x); });
+    }
+    function state() {
+      var c = get(KEY_C);
+      document.getElementById('state-en').textContent = c === 'granted' ? 'Your choice: allowed' : c === 'denied' ? 'Your choice: not allowed' : 'No choice saved on this browser';
+      document.getElementById('state-zh').textContent = c === 'granted' ? '当前：已同意' : c === 'denied' ? '当前：未同意' : '这个浏览器还没有保存选择';
+    }
+    document.querySelectorAll('[data-set]').forEach(function (b) { b.onclick = function () { set(KEY_L, b.getAttribute('data-set')); apply(b.getAttribute('data-set')); }; });
+    // 清掉选择回到首页：需要问的地区会重新出现同意提示
+    document.querySelectorAll('[data-reset]').forEach(function (b) { b.onclick = function () { set(KEY_C, null); location.href = '/'; }; });
+    apply(l); state();
+  })();
+</script>
+</body>
+</html>
