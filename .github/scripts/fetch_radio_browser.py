@@ -355,7 +355,7 @@ def to_rows(stations, lex):
 
 def build_snapshot(rows, countries, lex, built_at):
     core = {
-        "rg": "cn", "v": 3, "builtAt": built_at, "n": len(rows),
+        "rg": "cn", "v": lex["coreV"], "builtAt": built_at, "n": len(rows),
         "tzs": lex["tzs"], "genres": lex["genres"], "genresEn": lex["genresEn"],
         "langs": lex["langs"], "langsEn": lex["langsEn"], "countries": countries,
         "lat": [], "lng": [], "prec": [], "g": [], "l": [], "c": [],
@@ -413,6 +413,8 @@ def load_lexicon(path=None):
     missing = [n for n in ("Unlabeled", "Other") if n.lower() not in lex["langPos"]]
     if missing:
         raise RuntimeError("词表缺少官方语言项 %s，请用 build_lexicon.py 重新生成" % missing)
+    if "coreV" not in lex:
+        raise RuntimeError("词表缺少 coreV（官方 core.v），旧词表请重新生成")
     lex["unlabeledLang"] = lex["langPos"]["unlabeled"]
     lex["otherLang"] = lex["langPos"]["other"]
     return lex

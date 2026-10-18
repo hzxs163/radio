@@ -165,6 +165,20 @@ class LexiconTest(unittest.TestCase):
         self.assertEqual(self.lex["langsEn"][self.lex["unlabeledLang"]], "Unlabeled")
         self.assertEqual(self.lex["langsEn"][self.lex["otherLang"]], "Other")
 
+    def test_core_v_matches_the_snapshot_the_lexicon_came_from(self):
+        """core.v 是官方自己的数据版本号（2026-10-18 快照是 1），备用源必须写同一个值。
+        词表是从仓库的 core 快照拟合出来的，所以两者 builtAt 还认得对方时 v 必须一致；
+        builtAt 已经错开说明数据换过轮，这时只要求 v 是个正经的整数版本。"""
+        self.assertIsInstance(self.lex["coreV"], int)
+        self.assertGreaterEqual(self.lex["coreV"], 1)
+        path = os.path.join(HERE, os.pardir, os.pardir, "api_core_cn.json")
+        if not os.path.exists(path):
+            self.skipTest("仓库里没有 core 快照")
+        with open(path, "r", encoding="utf-8") as f:
+            core = json.load(f)
+        if core["builtAt"] == self.lex["sourceBuiltAt"]:
+            self.assertEqual(core["v"], self.lex["coreV"])
+
     def test_lexicon_indices_are_in_range(self):
         for tag, (idx, _dom) in self.lex["tagGenre"].items():
             self.assertLess(idx, len(self.lex["genresEn"]))
@@ -356,7 +370,7 @@ class SnapshotTest(unittest.TestCase):
 
         self.assertEqual(core["builtAt"], rest["builtAt"])
         self.assertEqual(core["rg"], rest["rg"])
-        self.assertEqual(core["v"], 3)
+        self.assertEqual(core["v"], self.lex["coreV"])
         self.assertRegex(core["builtAt"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$")
         for key in ("lat", "lng", "prec", "g", "l", "c", "pop", "br", "fl"):
             self.assertEqual(len(core[key]), core["n"], key)

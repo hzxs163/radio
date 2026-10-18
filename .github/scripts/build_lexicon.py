@@ -151,6 +151,9 @@ def build(core, rest, step=DEFAULT_STEP):
     return {
         "note": "由官方快照反推的口径词表；生成命令见 build_lexicon.py，请勿手改",
         "sourceBuiltAt": core["builtAt"],
+        # core.v 是官方自己的数据版本号（2026-10-18 的快照是 1），备用源要跟官方同值，
+        # 所以从词表里带过去，而不是在脚本里写死一个猜的数。
+        "coreV": core["v"],
         "cellStep": step,
         "countries": countries,
         "genres": core["genres"],
