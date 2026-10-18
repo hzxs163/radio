@@ -1,0 +1,29 @@
+name: Fallback source self-test
+
+on:
+  push:
+    paths:
+      - '.github/scripts/**'
+      - '.github/workflows/fallback-self-test.yml'
+  pull_request:
+    paths:
+      - '.github/scripts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 全离线：fixtures/rb_pairs.json 是官方快照与 Radio Browser 的配对样本，不联网、不依赖上游
+      - name: 备用源脚本离线自检
+        run: python3 -m unittest discover -s .github/scripts -p "test_*.py" -v

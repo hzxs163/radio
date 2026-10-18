@@ -51,6 +51,8 @@ jobs:
         if: ${{ steps.main.outcome == 'failure' || inputs.use_fallback }}
         run: |
           echo "使用备用数据源 radio-browser.info ..."
+          # 先跑离线自检（几秒钟），规则或词表坏了就直接失败，不让它产出半吊子快照
+          python3 -m unittest discover -s .github/scripts -p "test_*.py"
           python3 .github/scripts/fetch_radio_browser.py /tmp
           echo "备用源生成成功（land-dots.json 保持仓库现有版本）"
 
