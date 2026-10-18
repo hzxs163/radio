@@ -89,7 +89,7 @@ jobs:
           TODAY=$(date +%F)
           mkdir -p "backups/$TODAY"
           for f in api_core_cn.json api_rest.json land-dots.json; do
-            [ -f "$f" ] && cp "$f" "backups/$TODAY/"
+            if [ -f "$f" ]; then cp "$f" "backups/$TODAY/"; fi
           done
           echo "旧数据已备份到 backups/$TODAY/"
 
@@ -97,8 +97,9 @@ jobs:
         if: steps.check.outputs.changed == '1'
         run: |
           for f in api_core_cn.json api_rest.json land-dots.json; do
-            [ -f "/tmp/$f" ] && cp "/tmp/$f" "$f"
+            if [ -f "/tmp/$f" ]; then cp "/tmp/$f" "$f"; fi
           done
+          true
 
       - name: 清理超过 360 个的备份
         if: steps.check.outputs.changed == '1'
