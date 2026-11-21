@@ -25,9 +25,9 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="stylesheet" href="fonts/fonts.css">
-    <link rel="stylesheet" crossorigin href="assets/index-BAO5wuaO.css">
-    <link rel="modulepreload" href="assets/index-B3p6nJ-f.js" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hzxs163/radio@main/fonts/fonts.css" onerror="this.onerror=null;this.href='fonts/fonts.css'">
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/hzxs163/radio@main/assets/index-BAO5wuaO.css" onerror="this.onerror=null;this.href='assets/index-BAO5wuaO.css'">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/gh/hzxs163/radio@main/assets/index-B3p6nJ-f.js" crossorigin="anonymous">
   </head>
   <body>
     <div class="gx pre" id="shell"><div class="intro night land">
@@ -52,11 +52,19 @@ somewhere new.</h1>
     <script>
       (function () {
         var q = new URLSearchParams(location.search), l = q.get('lang'), seen = false, el = document.getElementById('shell');
-        var src = 'assets/index-B3p6nJ-f.js', done = false, fired = false, hideIntro = false, timer = 0;
+        var CDN = 'https://cdn.jsdelivr.net/gh/hzxs163/radio@main/assets/index-B3p6nJ-f.js';
+        var LOCAL = 'assets/index-B3p6nJ-f.js';
+        var done = false, fired = false, hideIntro = false, timer = 0;
+        function inject(src, fallback) {
+          var s = document.createElement('script');
+          s.type = 'module'; s.crossOrigin = 'anonymous'; s.src = src;
+          if (fallback) s.onerror = function () { s.remove(); inject(fallback, null); };
+          document.head.appendChild(s);
+        }
         function fire() {
           if (fired) return; fired = true; clearTimeout(timer);
           if (hideIntro && el) el.remove();
-          var s = document.createElement('script'); s.type = 'module'; s.crossOrigin = 'anonymous'; s.src = src; document.head.appendChild(s);
+          inject(CDN, LOCAL);
         }
         // 静态托管下 /api/* 全靠 sw.js 顶替后端，而首次访问的页面此刻还不受它控制：直接放模块会让 core 数据直连 Pages 吃 404（包里 core 没有重试），新访客只能手动刷新一次。
         // 所以等 controller 就位再启动，最多等 2 秒；超时照旧加载，SW 装不上时也仍能走到底（那时接口本来也没人答，等更久没意义）。
