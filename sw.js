@@ -333,7 +333,14 @@ self.addEventListener('fetch', (e) => {
   if (p === '/icon-192.png') { e.respondWith(fetch('icon-192.png')); return; }
   if (p === '/og.png') { e.respondWith(fetch('og.png')); return; }
   if (p === '/manifest.webmanifest') { e.respondWith(fetch('manifest.webmanifest')); return; }
-  if (/^\/flags\/[a-z]{2}\.svg$/.test(p)) { e.respondWith(fetch('.' + p)); return; }
+  if (/^\/flags\/[a-z]{2}\.svg$/.test(p)) {
+    e.respondWith(
+      fetch('https://cdn.jsdelivr.net/gh/hzxs163/radio@main' + p)
+        .then((r) => r.ok ? r : fetch('.' + p))
+        .catch(() => fetch('.' + p))
+    );
+    return;
+  }
 
   /* API: stations */
   let m = p.match(/^\/api\/stations\/([^/]+)$/);
