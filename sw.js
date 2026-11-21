@@ -8,7 +8,7 @@
  */
 'use strict';
 
-const VERSION = 'rd-static-v1';
+const VERSION = 'rd-static-v2';
 const STATIC = ['index.html', 'about.html', 'privacy.html', 'manifest.webmanifest', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'og.png', 'land-dots.json', 'api_core_cn.json', 'api_rest.json'];
 
 self.addEventListener('install', (e) => {
@@ -17,9 +17,114 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== DATA_CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())
   );
 });
+
+/* ---------- 快照数据：本地优先 + 镜像回退 + 缓存优先 ---------- */
+const DATA_CACHE = VERSION + '-data';
+const SNAP_TTL = 6 * 3600 * 1000;
+const MIRROR_BASE = [
+  'https://cdn.jsdelivr.net/gh/hzxs163/radio@main/',
+  'https://gh-proxy.org/https://raw.githubusercontent.com/hzxs163/radio/main/',
+];
+const LOCAL_TIMEOUT = 3500;
+const MIRROR_TIMEOUT = 10000;
+
+async function fetchT(url, timeoutMs, init) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    return await fetch(url, Object.assign({ signal: ctl.signal }, init || {}));
+  } finally { clearTimeout(t); }
+}
+
+function snapKey(name) { return '/__data/' + name; }
+
+function builtAtOf(buf) {
+  const head = new TextDecoder().decode(buf.slice(0, Math.min(buf.byteLength, 256)));
+  const m = head.match(/"builtAt":"([^"]+)"/);
+  return m ? m[1] : '';
+}
+
+async function fetchSnap(file) {
+  const urls = [new URL(file, self.location).href].concat(MIRROR_BASE.map((b) => b + file));
+  let lastErr = null;
+  for (let i = 0; i < urls.length; i++) {
+    try {
+      const r = await fetchT(urls[i], i === 0 ? LOCAL_TIMEOUT : MIRROR_TIMEOUT);
+      if (!r.ok) { lastErr = new Error('snapshot ' + r.status); continue; }
+      const buf = await r.arrayBuffer();
+      if (buf.byteLength < 1024) { lastErr = new Error('snapshot empty'); continue; }
+      return { buf, builtAt: builtAtOf(buf) };
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('snapshot unreachable');
+}
+
+async function storeSnap(c, file, buf, builtAt) {
+  const headers = new Headers({ 'Content-Type': 'application/json; charset=utf-8' });
+  headers.set('x-rd-built', builtAt || '');
+  headers.set('x-rd-ts', String(Date.now()));
+  await c.put(snapKey(file), new Response(buf, { status: 200, headers }));
+}
+
+function plainJson(buf) {
+  return new Response(buf, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
+}
+
+let revalidating = null;
+function revalidate() {
+  if (revalidating) return revalidating;
+  revalidating = (async () => {
+    try {
+      const [core, rest, dots] = await Promise.all([
+        fetchSnap('api_core_cn.json'),
+        fetchSnap('api_rest.json'),
+        fetchSnap('land-dots.json').catch(() => null),
+      ]);
+      if (!core.builtAt || core.builtAt !== rest.builtAt) return;
+      const c = await caches.open(DATA_CACHE);
+      await storeSnap(c, 'api_rest.json', rest.buf, rest.builtAt);
+      await storeSnap(c, 'api_core_cn.json', core.buf, core.builtAt);
+      if (dots) await storeSnap(c, 'land-dots.json', dots.buf, '');
+    } catch (e) {} finally { revalidating = null; }
+  })();
+  return revalidating;
+}
+
+async function getData(file) {
+  const c = await caches.open(DATA_CACHE);
+  const pair = file === 'api_rest.json' || file === 'api_core_cn.json';
+  const other = file === 'api_rest.json' ? 'api_core_cn.json' : 'api_rest.json';
+
+  const hit = await c.match(snapKey(file));
+  const otherHit = pair ? await c.match(snapKey(other)) : null;
+
+  if (hit) {
+    const built = hit.headers.get('x-rd-built') || '';
+    const ts = Number(hit.headers.get('x-rd-ts') || 0);
+    const pairOk = !pair || (otherHit && (otherHit.headers.get('x-rd-built') || '') === built);
+    if (pairOk) {
+      if (Date.now() - ts > SNAP_TTL) revalidate();
+      return hit;
+    }
+  }
+
+  try {
+    const got = await fetchSnap(file);
+    await storeSnap(c, file, got.buf, got.builtAt);
+    if (pair) {
+      const otherBuilt = otherHit && (otherHit.headers.get('x-rd-built') || '');
+      if (otherHit && otherBuilt && otherBuilt !== got.builtAt) revalidate();
+    }
+    return plainJson(got.buf);
+  } catch (e) {
+    const fallback = hit || otherHit;
+    if (fallback) return fallback;
+    throw e;
+  }
+}
 
 /* ---------- 工具 ---------- */
 const RB_HOSTS = ['de1.api.radio-browser.info', 'de2.api.radio-browser.info', 'fi1.api.radio-browser.info', 'at1.api.radio-browser.info'];
@@ -65,7 +170,7 @@ const stationCache = new Map();
 async function getStation(shortId) {
   const hit = stationCache.get(shortId);
   if (hit && Date.now() - hit.t < 5 * 60 * 1000) return hit.v;
-  const rest = await (await fetch('api_rest.json')).json();
+  const rest = await (await getData('api_rest.json')).json();
   const i = rest.id.indexOf(shortId);
   if (i < 0) return null;
   const name = rest.name[i];
@@ -208,11 +313,18 @@ self.addEventListener('fetch', (e) => {
   if (p === '/api/globe') {
     const part = url.searchParams.get('part');
     const file = part === 'rest' ? 'api_rest.json' : 'api_core_cn.json';
-    e.respondWith(fetch(file).then((r) => r.ok ? jsonP(r) : json({ error: 'snapshot missing' }, 500)));
+    e.respondWith(
+      getData(file)
+        .then((r) => r.ok ? jsonP(r) : json({ error: 'snapshot missing' }, 500))
+        .catch(() => json({ error: 'snapshot unreachable' }, 504))
+    );
     return;
   }
   /* 静态路径 rewrite（JS 里原站绝对路径） */
-  if (p === '/land-dots.json') { e.respondWith(fetch('land-dots.json').then((r) => r.ok ? r : json({ error: 'missing' }, 500))); return; }
+  if (p === '/land-dots.json') {
+    e.respondWith(getData('land-dots.json').then((r) => r.ok ? r : json({ error: 'missing' }, 500)).catch(() => json({ error: 'missing' }, 500)));
+    return;
+  }
   if (p === '/about.html') { e.respondWith(fetch('about.html')); return; }
   if (p === '/privacy.html') { e.respondWith(fetch('privacy.html')); return; }
   if (p === '/favicon.svg') { e.respondWith(fetch('favicon.svg')); return; }
