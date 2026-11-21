@@ -51,13 +51,16 @@ async function fetchSnap(file) {
   const urls = [new URL(file, self.location).href].concat(MIRROR_BASE.map((b) => b + file));
   let lastErr = null;
   for (let i = 0; i < urls.length; i++) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), i === 0 ? LOCAL_TIMEOUT : MIRROR_TIMEOUT);
     try {
-      const r = await fetchT(urls[i], i === 0 ? LOCAL_TIMEOUT : MIRROR_TIMEOUT);
+      const r = await fetch(urls[i], { signal: ctl.signal });
       if (!r.ok) { lastErr = new Error('snapshot ' + r.status); continue; }
       const buf = await r.arrayBuffer();
       if (buf.byteLength < 1024) { lastErr = new Error('snapshot empty'); continue; }
       return { buf, builtAt: builtAtOf(buf) };
     } catch (e) { lastErr = e; }
+    finally { clearTimeout(t); }
   }
   throw lastErr || new Error('snapshot unreachable');
 }
