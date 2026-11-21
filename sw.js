@@ -25,11 +25,11 @@ self.addEventListener('activate', (e) => {
 const DATA_CACHE = VERSION + '-data';
 const SNAP_TTL = 6 * 3600 * 1000;
 const MIRROR_BASE = [
-  'https://cdn.jsdelivr.net/gh/hzxs163/radio@main/',
+  'https://radio.hzxs163.qzz.io/data/',
   'https://gh-proxy.org/https://raw.githubusercontent.com/hzxs163/radio/main/',
+  'https://cdn.jsdelivr.net/gh/hzxs163/radio@main/',
 ];
-const LOCAL_TIMEOUT = 3500;
-const MIRROR_TIMEOUT = 10000;
+const SNAP_TIMEOUTS = [3000, 15000, 15000, 20000];
 
 async function fetchT(url, timeoutMs, init) {
   const ctl = new AbortController();
@@ -52,7 +52,7 @@ async function fetchSnap(file) {
   let lastErr = null;
   for (let i = 0; i < urls.length; i++) {
     const ctl = new AbortController();
-    const t = setTimeout(() => ctl.abort(), i === 0 ? LOCAL_TIMEOUT : MIRROR_TIMEOUT);
+    const t = setTimeout(() => ctl.abort(), SNAP_TIMEOUTS[i] || 20000);
     try {
       const r = await fetch(urls[i], { signal: ctl.signal });
       if (!r.ok) { lastErr = new Error('snapshot ' + r.status); continue; }
